@@ -1,63 +1,133 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Node {
   int data;
   struct Node *next;
 } node;
 
-// node * lastNode(node *firstNode){
-//   node *currentNode = firstNode;
+node * newNode(node *lastNode);
+void printNodes(node *firstNode);
+node * findNode(node *firstNode);
+void deleteNode(node *selectedNode, node *firstNode);
+void updateNode(node *selectedNode, node *firstNode);
 
-//   while(1){
-//     if((*currentNode).next == NULL){
-//       return currentNode;
-//     } else {
-//       currentNode = (*currentNode).next;
-//     }
-//   }
-// }
+void main() {
 
-// void newNode(int data, node *firstNode){
-//   node *myLastNode = lastNode(firstNode);
+  node *firstNode = NULL;
+  node *lastNode = NULL;
+  node *selectedNode;
 
-//   node newNode = {1, NULL};
-//   (*myLastNode).next = &newNode;
-// }
+  char input[16];
+  char command[16];
 
-void newNode(int data, node *lastNode){
-
-  node newNode;
-  newNode.data = data;
-  newNode.next = NULL;
-  (*lastNode).next = &newNode;
+  while(1) {
+    printf("Command: ");
+    fgets(input, 15, stdin);
+    sscanf(input, "%s", command);
+    if (strncmp(command, "quit", 4) == 0 || strncmp(command, "exit", 4) == 0) {
+      break;
+    } else if (strncmp(command, "add", 3) == 0) {
+      if (firstNode == NULL) {
+        firstNode = newNode(lastNode);
+        lastNode = firstNode;
+      } else {
+        lastNode = newNode(lastNode);
+      }
+    } else if (strncmp(command, "print", 5) == 0) {
+      printf("List of data:\n");
+      printNodes(firstNode);
+    } else if (strncmp(command, "delete", 6) == 0) {
+      selectedNode = findNode(firstNode);
+      if (selectedNode == firstNode) {
+        firstNode = (*selectedNode).next;
+      }
+      deleteNode(selectedNode, firstNode);
+    } else if (strncmp(command, "update", 6) == 0) {
+      selectedNode = findNode(firstNode);
+      updateNode(selectedNode, firstNode);
+    }
+  }
 }
 
-void printNodes(node *firstNode){
+node * newNode(node *lastNode) {
+
+  printf("Data: ");
+  char input[16];
+  fgets(input, 15, stdin);
+
+  node *newNode = malloc(sizeof(node));
+  sscanf(input, "%d", &((*newNode).data));
+  (*newNode).next = NULL;
+  if (lastNode != NULL) {
+    (*lastNode).next = newNode;
+  }
+  return newNode;
+}
+
+void printNodes(node *firstNode) {
+
+  int counter = 0;
   node *currentNode = firstNode;
 
   while(currentNode != NULL){
-    printf("%d\n", (*currentNode).data);
+    counter++;
+    printf("%d - %d\n", counter, (*currentNode).data);
     currentNode = (*currentNode).next;
   }
 }
 
-void main(){
+node * findNode(node *firstNode) {
 
-  node node1 = {0, NULL};
-  node node2 = {1, NULL};
-  node node3 = {2, NULL};
+  printNodes(firstNode);
 
-  node1.next = &node2;
-  node2.next = &node3;
+  char input[16];
+  int selectedIndex;
+  int counter = 1;
 
-  node newNode;
-  newNode.data = 3;
-  newNode.next = NULL;
-  node3.next = &newNode;
+  printf("Select by index: ");
+  fgets(input, 15, stdin);
+  sscanf(input, "%d", &selectedIndex);
 
-  // newNode(3, &node3);
+  node *currentNode = firstNode;
 
-  printNodes(&node1);
+  while(currentNode != NULL) {
+    if (counter == selectedIndex) {
+      return currentNode;
+    }
+    currentNode = (*currentNode).next;
+    counter++;
+  }
+}
 
+void deleteNode(node *selectedNode, node *firstNode) {
+
+  node *currentNode = firstNode;
+
+  while (currentNode != NULL) {
+    if ((*currentNode).next == selectedNode ) {
+      (*currentNode).next = (*selectedNode).next;
+    }
+    currentNode = (*currentNode).next;
+  }
+}
+
+void updateNode(node *selectedNode, node *firstNode) {
+  
+  char input[16];
+  int newData;
+
+  printf("New data: ");
+  fgets(input, 15, stdin);
+  sscanf(input, "%d", &newData);
+
+  node *currentNode = firstNode;
+
+  while (currentNode != NULL) {
+    if (currentNode == selectedNode ) {
+      (*currentNode).data = newData;
+    }
+    currentNode = (*currentNode).next;
+  }  
 }
